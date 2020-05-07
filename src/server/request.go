@@ -150,6 +150,8 @@ func getAdditionalRecordsCount(buf []byte) uint16 {
 
 func getHeader(buf *[]byte) {
 
+	req.Header.byteRange = posRange{ 0, 12 } //default
+
 	req.Header.TransactionID = getTransactionID((*buf)[0:2])
 
 	req.Header.Flags = getFlags((*buf)[2:4])

@@ -6,9 +6,15 @@ import (
 )
 
 type Question struct {
-	QNAME string
-	QTYPE string
-	QCLASS string
+	/*
+	*	This struct is not to be modified,
+	*	hence we do not need the members in
+	*	*BYTES*
+	*/
+
+	QNAME []byte
+	QTYPE [2]byte
+	QCLASS [2]byte
 
 	//custom variables
 	labels []string
@@ -16,11 +22,30 @@ type Question struct {
 
 	//custom public variables
 	Domain string
+	
+	QRecord string
+	QClass string
+
+	byteRange posRange
 }
 
-type posRange struct {
-	start int
-	end int
+func (qs *Question) toBytes() (int, []byte) {
+	length := len(qs.QNAME) + 6
+
+	bytes := make([]byte, length)
+
+	i:=0
+
+	for i=0; i<len(qs.QNAME); i++ {
+		bytes[i] = qs.QNAME[i]
+	}
+	bytes[i + 1] = qs.QTYPE[0]
+	bytes[i + 2] = qs.QTYPE[1]
+	bytes[i + 3] = qs.QCLASS[0]
+	bytes[i + 4] = qs.QCLASS[1]
+
+	return (i + 5), bytes
+
 }
 
 
@@ -151,9 +176,14 @@ func getQuestion(buf *[]byte) {
 
 	terminator := bytes.IndexByte(*buf, 0x00)
 
+	req.Question.byteRange = posRange{
+		12,
+		12 + terminator + 5,
+	}
+
 	buffer := (*buf)[:terminator]					
 
-	qtype := (*buf)[terminator + 1:terminator+3]
+	qtype := (*buf)[terminator + 1:terminator + 3]
 	qclass := (*buf)[terminator + 3:terminator + 5]
 
 
@@ -165,12 +195,18 @@ func getQuestion(buf *[]byte) {
 	
 	labels, labelCount := getLabels(&buffer, terminator)
 
+	/* Required Variables */
+	req.Question.QNAME = buffer
+	req.Question.QTYPE[0] = qtype[0]
+	req.Question.QTYPE[1] = qtype[1]
+
+	req.Question.QCLASS[0] = qclass[0]
+	req.Question.QCLASS[1] = qclass[1]
+	
+
+	/* Custom Variables */
+	req.Question.QRecord = getQTYPE(&qtype)
+	req.Question.QClass = getQCLASS(&qclass)
 	req.Question.Domain = getDomain(labels, labelCount)
-
-	req.Question.QNAME = getQNAME(labels, labelCount) 
-
-	req.Question.QTYPE = getQTYPE(&qtype)
-
-	req.Question.QCLASS = getQCLASS(&qclass)
 
 }

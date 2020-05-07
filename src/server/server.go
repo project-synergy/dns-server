@@ -12,6 +12,11 @@ var res *Response
 
 type MiddleWare func() bool
 
+type posRange struct {
+	start int
+	end int
+}
+
 type App struct {
 	PORT int
 	MiddleWares []MiddleWare

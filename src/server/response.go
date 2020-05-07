@@ -7,6 +7,17 @@ import (
 
 type Response struct {
 	Header Header
+	Question Question
+	Answers []Answer
+
+	bytesWritten int
+}
+
+func (res *Response) AddAnswer(answer Answer) {
+
+	res.Answers = append(res.Answers, answer)	
+
+	res.Header.setANCount(res.Header.ANCOUNT + 1)
 }
 
 
@@ -34,20 +45,76 @@ func buildResponse(buf *[]byte) {
 
 }
 
-func (res *Response) setHeader(buf *[]byte) {
+
+
+
+
+
+
+
+
+
+/* 
+*
+*	Below functions does not need much modification.
+*
+*/
+
+func (res *Response) setHeader(buf *[]byte) int {
+
+	res.bytesWritten = 0
 
 	header := res.Header.toBytes()
 
 	for i:=0; i<12; i++ {
+		res.bytesWritten += 1
 		(*buf)[i] = header[i]
 	}
+
+	return res.bytesWritten
 }
 
-func (res *Response) setQuestion(buf *byte) {
+func (res *Response) setQuestion(buf *[]byte) int {
 	/*
 		Question must not be modified
 	*/
 
-	//Leave it as it is.
+	len, bytes := req.Question.toBytes()
 
+	for i:=0; i<len; i++ {
+		(*buf)[res.bytesWritten] = bytes[i]
+		res.bytesWritten++
+	}
+
+	return res.bytesWritten
+
+	//fmt.Println((*buf)[:res.bytesWritten])
+	
+
+	/*fmt.Println((*buf)[req.Question.byteRange.start:req.Question.byteRange.end])
+
+	for i:= req.Question.byteRange.start; i< req.Question.byteRange.end; i++ {
+
+		fmt.Println((*buf)[i])
+
+	}*/
+
+	//Leave it as it is.
+}
+
+func (res *Response) setAnswers(buf *[]byte) int {
+
+	for i:=0; i< len(res.Answers); i++ {
+
+		len, bytes := res.Answers[i].toBytes()
+
+		for j:=0; j< len; j++ {
+			(*buf)[res.bytesWritten] = bytes[j]
+			res.bytesWritten++
+		}
+
+	}
+
+	return res.bytesWritten
+	
 }

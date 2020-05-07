@@ -19,7 +19,7 @@ func listenTo(PORT int) {
 
 	for {
 		buf := make([]byte, 512)
-		n, addr, err := pc.ReadFrom(buf)
+		_, addr, err := pc.ReadFrom(buf)
 		if err != nil {
 			continue
 		}
@@ -38,9 +38,14 @@ func listenTo(PORT int) {
 		/*
 		*	Send back the response and reset Request and Response
 		*/
-		res.setHeader(&buf) //default Header
 
-		pc.WriteTo(buf[:n], addr)	//send response
+		newBuf := make([]byte, 512)
+
+		res.setHeader(&newBuf) //default Header
+		res.setQuestion(&newBuf) // No modification Done
+		bytesWritten := res.setAnswers(&newBuf)
+
+		pc.WriteTo(newBuf[:bytesWritten], addr)	//send response
 
 		APP.Clear() //Clear request and response
 

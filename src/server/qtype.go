@@ -28,7 +28,7 @@ func getQTYPEvalues(buf *[]byte) string {
 		case 13: return "HINFO"
 		case 14: return "MINFO"
 		case 15: return "MX"
-		case 16: return "MX"
+		case 16: return "TXT"
 		default: return ""
 		
 	}

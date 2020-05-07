@@ -2,18 +2,49 @@ package main
 
 import (
 	"server"
-	"fmt"
+	_ "fmt"
+	"strings"
+	"strconv"
 )
 
 var APP *server.App
 var req *server.Request
 var res *server.Response
 
-func sendMyDomain() bool {
-	fmt.Println(req.Question.Domain)
+type A struct {
+	record [4]byte
+}
 
-	if req.Question.Domain == "manushamil.com" {
-		fmt.Println("My Domain")
+func sendMyDomain() bool {
+
+	answer := server.Answer{}
+	
+	if req.Question.QRecord == "A" {
+
+		if req.Question.Domain == "manushamil.com" {
+			
+
+			bytes := []byte{}
+
+			record := "34.93.61.81"
+
+			parts := strings.Split(record, ".")
+
+			for i:=0; i<len(parts); i++ {
+				part, _ := strconv.ParseUint(parts[i], 10, 8)
+
+				bytes = append(bytes, byte(part))
+			}
+
+			answer.SetName()
+			answer.SetTYPE("A")
+			answer.SetClass()
+			answer.SetTTL(400)
+			answer.SetRDATA(bytes)
+
+			res.AddAnswer(answer)
+			res.AddAnswer(answer)
+		}
 	}
 
 	return true
