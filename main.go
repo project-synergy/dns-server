@@ -2,45 +2,55 @@ package main
 
 import (
 	"server"
+	"records"
 	_ "fmt"
-	"strings"
-	"strconv"
 )
 
 var APP *server.App
 var req *server.Request
 var res *server.Response
 
-type A struct {
-	record [4]byte
-}
-
 func sendMyDomain() bool {
 
-	answer := server.Answer{}
-	
-	if req.Question.QRecord == "A" {
+	if req.Question.QType == "A" {
 
 		if req.Question.Domain == "manushamil.com" {
-			
+			var record records.IRecord
 
-			bytes := []byte{}
-
-			record := "34.93.61.81"
-
-			parts := strings.Split(record, ".")
-
-			for i:=0; i<len(parts); i++ {
-				part, _ := strconv.ParseUint(parts[i], 10, 8)
-
-				bytes = append(bytes, byte(part))
+			answer := server.Answer{}
+			record = records.A {
+				IPAddress : "34.93.61.81",
 			}
 
 			answer.SetName()
 			answer.SetTYPE("A")
 			answer.SetClass()
 			answer.SetTTL(400)
-			answer.SetRDATA(bytes)
+			answer.SetRDATA(record.ToBytes())
+
+			res.AddAnswer(answer)
+			res.AddAnswer(answer)
+		}
+	} 
+
+
+	if req.Question.QType == "MX" {
+
+		if req.Question.Domain == "manushamil.com" {
+			var record records.IRecord
+
+			answer := server.Answer{}
+
+			record = records.MX {
+				Preference: 10,
+				Exchange: "mail.google.com",
+			}
+
+			answer.SetName()
+			answer.SetTYPE("MX")
+			answer.SetClass()
+			answer.SetTTL(400)
+			answer.SetRDATA(record.ToBytes())
 
 			res.AddAnswer(answer)
 			res.AddAnswer(answer)

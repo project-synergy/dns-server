@@ -23,7 +23,7 @@ type Question struct {
 	//custom public variables
 	Domain string
 	
-	QRecord string
+	QType string
 	QClass string
 
 	byteRange posRange
@@ -205,7 +205,7 @@ func getQuestion(buf *[]byte) {
 	
 
 	/* Custom Variables */
-	req.Question.QRecord = getQTYPE(&qtype)
+	req.Question.QType = getQTYPE(&qtype)
 	req.Question.QClass = getQCLASS(&qclass)
 	req.Question.Domain = getDomain(labels, labelCount)
 

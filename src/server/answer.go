@@ -66,8 +66,12 @@ func (ans *Answer) SetRDATA(data []byte) {
 	ans.rdLength = len(data)
 	length := uint16(ans.rdLength)
 
-	ans.RDLength[0] = byte((length >> 8) & 0xF)
-	ans.RDLength[1] = byte(length & 0xF)
+	//fmt.Println(length)
+
+	ans.RDLength[0] = byte((length >> 8) & 0xFF)
+	ans.RDLength[1] = byte(length & 0xFF)
+
+	//fmt.Println(ans.RDLength)
 
 
 	ans.RData = data
